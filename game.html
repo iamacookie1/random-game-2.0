@@ -31,14 +31,161 @@
             height: 100vh;
             background: linear-gradient(135deg, #8b5a2b 0%, #a0522d 50%, #8b6f47 100%);
             z-index: 1000;
+            position: relative;
+            overflow: hidden;
         }
 
         .title-screen.hidden {
             display: none;
         }
 
+        /* Animated background pattern */
+        .title-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(212, 165, 116, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(212, 165, 116, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(139, 69, 19, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 90% 10%, rgba(212, 165, 116, 0.1) 0%, transparent 50%);
+            background-size: 600px 600px, 700px 700px, 800px 800px, 900px 900px;
+            background-position: 0 0, 100px 60px, -50px 100px, 80px -100px;
+            animation: backgroundShift 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% {
+                background-position: 0 0, 100px 60px, -50px 100px, 80px -100px;
+            }
+            50% {
+                background-position: 50px 50px, 150px 110px, 0px 150px, 130px -50px;
+            }
+        }
+
+        /* Decorative gems floating in background */
+        .floating-gem {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .gem-1 {
+            top: 10%;
+            left: 10%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .gem-2 {
+            top: 70%;
+            right: 15%;
+            animation: float 8s ease-in-out infinite 1s;
+            width: 50px;
+            height: 50px;
+        }
+
+        .gem-3 {
+            top: 30%;
+            right: 10%;
+            animation: float 7s ease-in-out infinite 2s;
+            width: 35px;
+            height: 35px;
+        }
+
+        .gem-4 {
+            bottom: 15%;
+            left: 12%;
+            animation: float 9s ease-in-out infinite 1.5s;
+            width: 45px;
+            height: 45px;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotateZ(0deg);
+            }
+            50% {
+                transform: translateY(-30px) rotateZ(180deg);
+            }
+        }
+
+        /* Frame around title content */
+        .title-frame {
+            position: relative;
+            z-index: 10;
+            background: rgba(61, 40, 23, 0.8);
+            border: 4px solid #d4a574;
+            border-radius: 20px;
+            padding: 60px 80px;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 40px rgba(212, 165, 116, 0.3);
+        }
+
+        /* Decorative corners */
+        .title-frame::before,
+        .title-frame::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #d4a574;
+        }
+
+        .title-frame::before {
+            top: -8px;
+            left: -8px;
+            border-right: none;
+            border-bottom: none;
+            border-radius: 10px 0 0 0;
+        }
+
+        .title-frame::after {
+            top: -8px;
+            right: -8px;
+            border-left: none;
+            border-bottom: none;
+            border-radius: 0 10px 0 0;
+        }
+
+        .bottom-corners {
+            position: absolute;
+            bottom: -8px;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #d4a574;
+        }
+
+        .bottom-left {
+            left: -8px;
+            border-right: none;
+            border-top: none;
+            border-radius: 0 0 0 10px;
+        }
+
+        .bottom-right {
+            right: -8px;
+            border-left: none;
+            border-top: none;
+            border-radius: 0 0 10px 0;
+        }
+
         .title-content {
             text-align: center;
+            position: relative;
+            z-index: 11;
         }
 
         .game-title {
@@ -47,6 +194,7 @@
             margin-bottom: 20px;
             text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
             color: #00d4ff;
+            letter-spacing: 3px;
         }
 
         .game-subtitle {
@@ -355,12 +503,22 @@
 <body>
     <!-- Title Screen -->
     <div class="title-screen" id="titleScreen">
-        <div class="title-content">
-            <h1 class="game-title">Crystal Collector</h1>
-            <p class="game-subtitle">Collect crystals and avoid meteors!</p>
-            <div class="button-container">
-                <button class="title-button play-button" id="playButton">Play</button>
-                <button class="title-button how-to-button" id="howToButton">How to Play</button>
+        <div class="floating-gem gem-1"></div>
+        <div class="floating-gem gem-2"></div>
+        <div class="floating-gem gem-3"></div>
+        <div class="floating-gem gem-4"></div>
+
+        <div class="title-frame">
+            <div class="bottom-corners bottom-left"></div>
+            <div class="bottom-corners bottom-right"></div>
+            
+            <div class="title-content">
+                <h1 class="game-title">Crystal Collector</h1>
+                <p class="game-subtitle">Collect crystals and avoid meteors!</p>
+                <div class="button-container">
+                    <button class="title-button play-button" id="playButton">Play</button>
+                    <button class="title-button how-to-button" id="howToButton">How to Play</button>
+                </div>
             </div>
         </div>
     </div>
