@@ -349,6 +349,38 @@
             transform: scale(1.05);
         }
 
+        .pause-modal-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .pause-button {
+            padding: 12px 30px;
+            background-color: #00d4ff;
+            color: #3d2817;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pause-button:hover {
+            background-color: #00f0ff;
+            transform: scale(1.02);
+        }
+
+        .pause-button.secondary {
+            background-color: #d4a574;
+        }
+
+        .pause-button.secondary:hover {
+            background-color: #e8c89a;
+        }
+
         /* Game Screen Styles */
         .game-screen {
             display: none;
@@ -382,10 +414,20 @@
             background: linear-gradient(135deg, #a0522d 0%, #8b6f47 100%);
         }
 
-        .score-display {
+        .top-bar {
             position: absolute;
             top: 20px;
-            right: 20px;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            pointer-events: none;
+        }
+
+        .score-display {
             background-color: rgba(0, 0, 0, 0.7);
             padding: 15px 25px;
             border-radius: 8px;
@@ -394,8 +436,27 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            z-index: 100;
             border: 2px solid #d4a574;
+            pointer-events: auto;
+        }
+
+        .pause-button-game {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            border: 2px solid #d4a574;
+            color: #d4a574;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            pointer-events: auto;
+        }
+
+        .pause-button-game:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+            color: #00d4ff;
+            box-shadow: 0 0 10px rgba(212, 165, 116, 0.5);
         }
 
         .primogem-icon {
@@ -414,6 +475,67 @@
             border: 2px solid #fff;
             z-index: 50;
             transform: translate(-50%, -50%);
+        }
+
+        .player-aura {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            z-index: 49;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .player-aura.speed {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #ffc800;
+            box-shadow: 0 0 15px rgba(255, 200, 0, 0.8), inset 0 0 15px rgba(255, 200, 0, 0.4);
+            animation: pulse-speed 1s ease-in-out infinite;
+        }
+
+        .player-aura.shield {
+            width: 55px;
+            height: 55px;
+            border: 3px solid #00c8ff;
+            box-shadow: 0 0 20px rgba(0, 200, 255, 0.8), inset 0 0 15px rgba(0, 200, 255, 0.4);
+            animation: pulse-shield 1.5s ease-in-out infinite;
+        }
+
+        .player-aura.frenzy {
+            width: 52px;
+            height: 52px;
+            border: 3px solid #ff9600;
+            box-shadow: 0 0 18px rgba(255, 150, 0, 0.8), inset 0 0 15px rgba(255, 150, 0, 0.4);
+            animation: pulse-frenzy 0.8s ease-in-out infinite;
+        }
+
+        @keyframes pulse-speed {
+            0%, 100% {
+                box-shadow: 0 0 15px rgba(255, 200, 0, 0.8), inset 0 0 15px rgba(255, 200, 0, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 25px rgba(255, 200, 0, 1), inset 0 0 20px rgba(255, 200, 0, 0.6);
+            }
+        }
+
+        @keyframes pulse-shield {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(0, 200, 255, 0.8), inset 0 0 15px rgba(0, 200, 255, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(0, 200, 255, 1), inset 0 0 20px rgba(0, 200, 255, 0.6);
+            }
+        }
+
+        @keyframes pulse-frenzy {
+            0%, 100% {
+                box-shadow: 0 0 18px rgba(255, 150, 0, 0.8), inset 0 0 15px rgba(255, 150, 0, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 28px rgba(255, 150, 0, 1), inset 0 0 20px rgba(255, 150, 0, 0.6);
+            }
         }
 
         .primogem {
@@ -718,16 +840,34 @@
         </div>
     </div>
 
+    <!-- Pause Modal -->
+    <div class="modal" id="pauseModal">
+        <div class="modal-content">
+            <h2 class="modal-header">Game Paused</h2>
+            <div class="modal-body" style="text-align: center;">
+                <p>Take a break and come back stronger!</p>
+            </div>
+            <div class="pause-modal-buttons">
+                <button class="pause-button" id="resumeButton">Resume</button>
+                <button class="pause-button secondary" id="homeButton">Back to Home</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Game Screen -->
     <div class="game-screen" id="gameScreen">
         <div class="game-container" id="gameContainer">
-            <div class="powerup-status" id="powerupStatus"></div>
+            <div class="top-bar">
+                <div class="powerup-status" id="powerupStatus"></div>
+                <div style="flex: 1;"></div>
+                <div class="score-display">
+                    <div class="primogem-icon"></div>
+                    <span id="scoreValue">0</span>
+                </div>
+                <button class="pause-button-game" id="pauseButtonGame">⏸ Pause</button>
+            </div>
             <div class="paralyzed-overlay" id="paralyzedOverlay"></div>
             <div class="paralyzed-text" id="paralyzedText">PARALYZED!</div>
-            <div class="score-display">
-                <div class="primogem-icon"></div>
-                <span id="scoreValue">0</span>
-            </div>
         </div>
     </div>
 
@@ -739,6 +879,10 @@
         const howToButton = document.getElementById('howToButton');
         const howToModal = document.getElementById('howToModal');
         const closeModal = document.getElementById('closeModal');
+        const pauseModal = document.getElementById('pauseModal');
+        const pauseButtonGame = document.getElementById('pauseButtonGame');
+        const resumeButton = document.getElementById('resumeButton');
+        const homeButton = document.getElementById('homeButton');
 
         playButton.addEventListener('click', () => {
             titleScreen.classList.add('hidden');
@@ -762,6 +906,7 @@
 
         // Game Logic
         let gameStarted = false;
+        let gamePaused = false;
 
         function startGame() {
             if (gameStarted) return;
@@ -778,7 +923,7 @@
             const METEOR_SIZE = 3;
             const METEOR_HALF_SIZE = Math.floor(METEOR_SIZE / 2);
             const COLLECTION_RADIUS = 0.3;
-            const POWERUP_SPAWN_INTERVAL = 15000; // Powerups spawn every 15 seconds
+            const POWERUP_SPAWN_INTERVAL = 15000;
 
             // Game state
             const game = {
@@ -816,6 +961,32 @@
             const paralyzedText = document.getElementById('paralyzedText');
             const powerupStatus = document.getElementById('powerupStatus');
 
+            // Pause functionality
+            pauseButtonGame.addEventListener('click', () => {
+                gamePaused = !gamePaused;
+                pauseModal.classList.toggle('active');
+            });
+
+            resumeButton.addEventListener('click', () => {
+                gamePaused = false;
+                pauseModal.classList.remove('active');
+            });
+
+            homeButton.addEventListener('click', () => {
+                gameStarted = false;
+                gamePaused = false;
+                pauseModal.classList.remove('active');
+                gameScreen.classList.remove('active');
+                titleScreen.classList.remove('hidden');
+            });
+
+            pauseModal.addEventListener('click', (e) => {
+                if (e.target === pauseModal) {
+                    gamePaused = false;
+                    pauseModal.classList.remove('active');
+                }
+            });
+
             // Create grid cells
             function createGrid() {
                 for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
@@ -836,6 +1007,38 @@
                 }
                 player.style.left = (game.player.gridX * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
                 player.style.top = (game.player.gridY * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
+
+                // Update aura
+                updatePlayerAura();
+            }
+
+            function updatePlayerAura() {
+                let aura = document.getElementById('playerAura');
+                
+                if (game.activePowerups.speed.active || game.activePowerups.shield.active || game.activePowerups.frenzy.active) {
+                    if (!aura) {
+                        aura = document.createElement('div');
+                        aura.id = 'playerAura';
+                        gameContainer.appendChild(aura);
+                    }
+
+                    // Remove all aura classes
+                    aura.className = 'player-aura';
+
+                    // Add the appropriate aura class based on active powerup priority
+                    if (game.activePowerups.speed.active) {
+                        aura.classList.add('speed');
+                    } else if (game.activePowerups.shield.active) {
+                        aura.classList.add('shield');
+                    } else if (game.activePowerups.frenzy.active) {
+                        aura.classList.add('frenzy');
+                    }
+
+                    aura.style.left = (game.player.gridX * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
+                    aura.style.top = (game.player.gridY * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
+                } else if (aura) {
+                    aura.remove();
+                }
             }
 
             // Spawn primogem
@@ -983,7 +1186,7 @@
 
             function getPrimogemeSpawnInterval() {
                 if (game.activePowerups.frenzy.active) {
-                    return 200; // 5 per second
+                    return 200;
                 }
                 return PRIMOGEM_SPAWN_INTERVAL;
             }
@@ -1100,7 +1303,7 @@
 
             function applyMeteorDamage() {
                 if (game.activePowerups.shield.active) {
-                    return; // Shield prevents damage
+                    return;
                 }
 
                 let paralyzeDuration;
@@ -1182,13 +1385,17 @@
             let powerupSpawnTime = Date.now();
 
             function update() {
+                if (gamePaused) {
+                    requestAnimationFrame(update);
+                    return;
+                }
+
                 const currentTime = Date.now();
                 const deltaTime = (currentTime - lastFrameTime) / 1000;
                 lastFrameTime = currentTime;
 
                 updatePlayerVelocity();
 
-                // Apply speed multiplier if active
                 let speedMultiplier = 1;
                 if (game.activePowerups.speed.active) {
                     speedMultiplier = 2;
@@ -1198,7 +1405,6 @@
                     }
                 }
 
-                // Update shield timer
                 if (game.activePowerups.shield.active) {
                     game.activePowerups.shield.timeRemaining -= deltaTime * 1000;
                     if (game.activePowerups.shield.timeRemaining <= 0) {
@@ -1206,7 +1412,6 @@
                     }
                 }
 
-                // Update frenzy timer
                 if (game.activePowerups.frenzy.active) {
                     game.activePowerups.frenzy.timeRemaining -= deltaTime * 1000;
                     if (game.activePowerups.frenzy.timeRemaining <= 0) {
