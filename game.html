@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crystal Collector Game - Cookie Edition</title>
+    <title>Crystal Collector Game</title>
     <style>
         * {
             margin: 0;
@@ -19,6 +19,195 @@
             background-color: #3d2817;
             font-family: Arial, sans-serif;
             color: white;
+        }
+
+        /* Title Screen Styles */
+        .title-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #8b5a2b 0%, #a0522d 50%, #8b6f47 100%);
+            z-index: 1000;
+        }
+
+        .title-screen.hidden {
+            display: none;
+        }
+
+        .title-content {
+            text-align: center;
+        }
+
+        .game-title {
+            font-size: 72px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+            color: #00d4ff;
+        }
+
+        .game-subtitle {
+            font-size: 24px;
+            margin-bottom: 60px;
+            color: #d4a574;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .button-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .title-button {
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .play-button {
+            background-color: #00d4ff;
+            color: #3d2817;
+        }
+
+        .play-button:hover {
+            background-color: #00f0ff;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .how-to-button {
+            background-color: #d4a574;
+            color: #3d2817;
+        }
+
+        .how-to-button:hover {
+            background-color: #e8c89a;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(212, 165, 116, 0.5);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #8b5a2b 0%, #a0522d 50%, #8b6f47 100%);
+            padding: 40px;
+            border-radius: 12px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 3px solid #d4a574;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-header {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #00d4ff;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-body {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #ffffff;
+            margin-bottom: 25px;
+        }
+
+        .modal-body h3 {
+            color: #d4a574;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .modal-body ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .modal-body li {
+            margin-bottom: 8px;
+        }
+
+        .damage-table {
+            width: 100%;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            border-collapse: collapse;
+        }
+
+        .damage-table th,
+        .damage-table td {
+            padding: 12px;
+            text-align: center;
+            border: 2px solid #d4a574;
+            color: #ffffff;
+        }
+
+        .damage-table th {
+            background-color: rgba(212, 165, 116, 0.3);
+            color: #d4a574;
+            font-weight: bold;
+        }
+
+        .damage-table tr:nth-child(even) {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .close-button {
+            display: block;
+            margin: 0 auto;
+            padding: 12px 30px;
+            background-color: #00d4ff;
+            color: #3d2817;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-button:hover {
+            background-color: #00f0ff;
+            transform: scale(1.05);
+        }
+
+        /* Game Screen Styles */
+        .game-screen {
+            display: none;
+        }
+
+        .game-screen.active {
+            display: flex;
         }
 
         .game-container {
@@ -123,7 +312,7 @@
             position: absolute;
             width: 120px;
             height: 120px;
-            background-color: #ff0000;
+            background-color: #8b0000;
             z-index: 40;
             transform: translate(-50%, -50%);
         }
@@ -164,415 +353,524 @@
     </style>
 </head>
 <body>
-    <div class="game-container" id="gameContainer">
-        <div class="paralyzed-overlay" id="paralyzedOverlay"></div>
-        <div class="paralyzed-text" id="paralyzedText">PARALYZED!</div>
-        <div class="score-display">
-            <div class="primogem-icon"></div>
-            <span id="scoreValue">0</span>
+    <!-- Title Screen -->
+    <div class="title-screen" id="titleScreen">
+        <div class="title-content">
+            <h1 class="game-title">Crystal Collector</h1>
+            <p class="game-subtitle">Collect crystals and avoid meteors!</p>
+            <div class="button-container">
+                <button class="title-button play-button" id="playButton">Play</button>
+                <button class="title-button how-to-button" id="howToButton">How to Play</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- How to Play Modal -->
+    <div class="modal" id="howToModal">
+        <div class="modal-content">
+            <h2 class="modal-header">How to Play</h2>
+            <div class="modal-body">
+                <h3>Movement</h3>
+                <p>Use WASD or Arrow Keys to move around the game board.</p>
+
+                <h3>Objective</h3>
+                <p>Collect as many crystals (blue gems) as possible while avoiding meteors!</p>
+
+                <h3>Crystals</h3>
+                <p>Blue hexagon-shaped crystals spawn randomly on the board. Walk over them to collect them and increase your score.</p>
+
+                <h3>Meteors</h3>
+                <p>Red squares fall from the sky. You'll get a warning before they land. Avoid being in the impact zone when they hit!</p>
+
+                <h3>Damage System</h3>
+                <p>If a meteor hits you, you'll be paralyzed and lose points. The damage depends on your current score:</p>
+                <table class="damage-table">
+                    <thead>
+                        <tr>
+                            <th>Score Range</th>
+                            <th>Paralysis Duration</th>
+                            <th>Points Lost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>0-10</td>
+                            <td>1 second</td>
+                            <td>1 point</td>
+                        </tr>
+                        <tr>
+                            <td>11-20</td>
+                            <td>2 seconds</td>
+                            <td>3 points</td>
+                        </tr>
+                        <tr>
+                            <td>21-50</td>
+                            <td>3 seconds</td>
+                            <td>5 points</td>
+                        </tr>
+                        <tr>
+                            <td>51+</td>
+                            <td>5 seconds</td>
+                            <td>7 points</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Difficulty Progression</h3>
+                <p>As you collect more crystals, more meteors will start spawning, making the game progressively harder!</p>
+
+                <p style="text-align: center; margin-top: 30px; font-style: italic;">Good luck, and have fun!</p>
+            </div>
+            <button class="close-button" id="closeModal">Close</button>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div class="game-screen" id="gameScreen">
+        <div class="game-container" id="gameContainer">
+            <div class="paralyzed-overlay" id="paralyzedOverlay"></div>
+            <div class="paralyzed-text" id="paralyzedText">PARALYZED!</div>
+            <div class="score-display">
+                <div class="primogem-icon"></div>
+                <span id="scoreValue">0</span>
+            </div>
         </div>
     </div>
 
     <script>
-        // Game constants
-        const GRID_SIZE = 20;
-        const GRID_CELL_SIZE = 40; // 800px / 20 = 40px per cell
-        const PLAYER_SPEED = 5; // grids per second
-        const PRIMOGEM_SPAWN_INTERVAL = 3000; // 3 seconds
-        const BASE_METEOR_SPAWN_INTERVAL = 7000; // 7 seconds (targeting meteors)
-        const BASE_RANDOM_METEOR_SPAWN_INTERVAL = 10000; // 10 seconds (random meteors)
-        const METEOR_WARNING_TIME = 3000; // 3 seconds before meteor lands
-        const METEOR_SIZE = 3; // 3x3 grid
-        const METEOR_HALF_SIZE = Math.floor(METEOR_SIZE / 2); // 1
-        const COLLECTION_RADIUS = 0.3; // How close player needs to be to collect
+        // Title Screen and Modal Logic
+        const titleScreen = document.getElementById('titleScreen');
+        const gameScreen = document.getElementById('gameScreen');
+        const playButton = document.getElementById('playButton');
+        const howToButton = document.getElementById('howToButton');
+        const howToModal = document.getElementById('howToModal');
+        const closeModal = document.getElementById('closeModal');
 
-        // Game state
-        const game = {
-            player: {
-                gridX: 10,
-                gridY: 10,
-                velocityX: 0,
-                velocityY: 0,
-                isParalyzed: false,
-                paralyzedTimeRemaining: 0
-            },
-            score: 0,
-            primogems: [],
-            meteors: [],
-            meteorWarnings: [],
-            keys: {},
-            gameRunning: true,
-            activeMeteorSpawners: {
-                targeting1: true,
-                targeting2: false,
-                random1: true,
-                random2: false
-            }
-        };
-
-        const gameContainer = document.getElementById('gameContainer');
-        const scoreValue = document.getElementById('scoreValue');
-        const paralyzedOverlay = document.getElementById('paralyzedOverlay');
-        const paralyzedText = document.getElementById('paralyzedText');
-
-        // Create grid cells
-        function createGrid() {
-            for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'grid-cell';
-                gameContainer.appendChild(cell);
-            }
-        }
-
-        // Update player visual position
-        function updatePlayerDisplay() {
-            let player = document.getElementById('playerElement');
-            if (!player) {
-                player = document.createElement('div');
-                player.id = 'playerElement';
-                player.className = 'player';
-                gameContainer.appendChild(player);
-            }
-            // Center player on the grid position
-            player.style.left = (game.player.gridX * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
-            player.style.top = (game.player.gridY * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
-        }
-
-        // Spawn primogem at random location (centered on grid)
-        function spawnPrimogem() {
-            const gridX = Math.floor(Math.random() * GRID_SIZE);
-            const gridY = Math.floor(Math.random() * GRID_SIZE);
-            const primogem = {
-                id: Date.now() + Math.random(),
-                gridX: gridX,
-                gridY: gridY,
-                element: null
-            };
-            game.primogems.push(primogem);
-            createPrimosgemElement(primogem);
-        }
-
-        function createPrimosgemElement(primogem) {
-            const element = document.createElement('div');
-            element.className = 'primogem';
-            // Center primogem on the grid position
-            element.style.left = (primogem.gridX * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
-            element.style.top = (primogem.gridY * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
-            gameContainer.appendChild(element);
-            primogem.element = element;
-        }
-
-        // Check if player collides with primogem
-        function checkPrimosgemCollision() {
-            for (let i = game.primogems.length - 1; i >= 0; i--) {
-                const primogem = game.primogems[i];
-                const distance = Math.sqrt(
-                    Math.pow(game.player.gridX - primogem.gridX, 2) +
-                    Math.pow(game.player.gridY - primogem.gridY, 2)
-                );
-                if (distance < COLLECTION_RADIUS) {
-                    game.score++;
-                    scoreValue.textContent = game.score;
-                    primogem.element.remove();
-                    game.primogems.splice(i, 1);
-                    updateMeteorSpawners(); // Check if we need to unlock new meteor spawners
-                }
-            }
-        }
-
-        // Update which meteor spawners are active based on score
-        function updateMeteorSpawners() {
-            if (game.score >= 30 && !game.activeMeteorSpawners.targeting2) {
-                game.activeMeteorSpawners.targeting2 = true;
-            }
-            if (game.score >= 50 && !game.activeMeteorSpawners.random2) {
-                game.activeMeteorSpawners.random2 = true;
-            }
-        }
-
-        // Get dynamic spawn interval based on score
-        function getTargetingMeteorInterval() {
-            if (game.score >= 50) return 5000; // 5 seconds at 50+ points
-            if (game.score >= 30) return 5500; // 5.5 seconds at 30+ points
-            return BASE_METEOR_SPAWN_INTERVAL; // 7 seconds default
-        }
-
-        function getRandomMeteorInterval() {
-            if (game.score >= 50) return 8000; // 8 seconds at 50+ points
-            return BASE_RANDOM_METEOR_SPAWN_INTERVAL; // 10 seconds default
-        }
-
-        // Spawn targeting meteor (locks onto player position)
-        function spawnTargetingMeteor() {
-            // Target the player's current position
-            let gridX = Math.round(game.player.gridX);
-            let gridY = Math.round(game.player.gridY);
-
-            // Clamp to valid grid positions
-            gridX = Math.max(0, Math.min(GRID_SIZE - 1, gridX));
-            gridY = Math.max(0, Math.min(GRID_SIZE - 1, gridY));
-
-            const meteor = {
-                id: Date.now() + Math.random(),
-                gridX: gridX,
-                gridY: gridY,
-                warningElement: null,
-                meteorElement: null,
-                hasLanded: false,
-                isRandom: false
-            };
-
-            // Create warning indicator (3x3 square centered on player)
-            const warningElement = document.createElement('div');
-            warningElement.className = 'meteor-warning';
-            warningElement.style.left = (gridX * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
-            warningElement.style.top = (gridY * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
-            gameContainer.appendChild(warningElement);
-            meteor.warningElement = warningElement;
-
-            game.meteorWarnings.push(meteor);
-
-            // Schedule meteor to land
-            setTimeout(() => {
-                landMeteor(meteor);
-            }, METEOR_WARNING_TIME);
-        }
-
-        // Spawn random meteor (no targeting)
-        function spawnRandomMeteor() {
-            // Random position on the grid
-            let gridX = Math.floor(Math.random() * GRID_SIZE);
-            let gridY = Math.floor(Math.random() * GRID_SIZE);
-
-            const meteor = {
-                id: Date.now() + Math.random(),
-                gridX: gridX,
-                gridY: gridY,
-                warningElement: null,
-                meteorElement: null,
-                hasLanded: false,
-                isRandom: true
-            };
-
-            // Create warning indicator (3x3 square at random location)
-            const warningElement = document.createElement('div');
-            warningElement.className = 'meteor-warning';
-            warningElement.style.left = (gridX * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
-            warningElement.style.top = (gridY * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
-            gameContainer.appendChild(warningElement);
-            meteor.warningElement = warningElement;
-
-            game.meteorWarnings.push(meteor);
-
-            // Schedule meteor to land
-            setTimeout(() => {
-                landMeteor(meteor);
-            }, METEOR_WARNING_TIME);
-        }
-
-        function landMeteor(meteor) {
-            // Remove warning
-            if (meteor.warningElement) {
-                meteor.warningElement.remove();
-            }
-
-            // Move to active meteors
-            const index = game.meteorWarnings.indexOf(meteor);
-            if (index > -1) {
-                game.meteorWarnings.splice(index, 1);
-            }
-            game.meteors.push(meteor);
-            meteor.hasLanded = true;
-
-            // Create meteor visual (3x3 square centered on target)
-            const meteorElement = document.createElement('div');
-            meteorElement.className = 'meteor';
-            meteorElement.style.left = (meteor.gridX * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
-            meteorElement.style.top = (meteor.gridY * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
-            gameContainer.appendChild(meteorElement);
-            meteor.meteorElement = meteorElement;
-
-            // Check collision
-            checkMeteorCollision(meteor);
-
-            // Remove meteor after a short time
-            setTimeout(() => {
-                if (meteor.meteorElement) {
-                    meteor.meteorElement.remove();
-                }
-                const idx = game.meteors.indexOf(meteor);
-                if (idx > -1) {
-                    game.meteors.splice(idx, 1);
-                }
-            }, 1000);
-        }
-
-        function checkMeteorCollision(meteor) {
-            // Check if player is in the 3x3 meteor impact area
-            const meteorStartX = meteor.gridX - METEOR_HALF_SIZE;
-            const meteorStartY = meteor.gridY - METEOR_HALF_SIZE;
-            const meteorEndX = meteorStartX + METEOR_SIZE;
-            const meteorEndY = meteorStartY + METEOR_SIZE;
-
-            // Round player position to check grid cell
-            const playerGridX = Math.round(game.player.gridX);
-            const playerGridY = Math.round(game.player.gridY);
-
-            if (
-                playerGridX >= meteorStartX &&
-                playerGridX < meteorEndX &&
-                playerGridY >= meteorStartY &&
-                playerGridY < meteorEndY
-            ) {
-                applyMeteorDamage();
-            }
-        }
-
-        function applyMeteorDamage() {
-            let paralyzeDuration;
-            let pointsLost;
-
-            if (game.score <= 10) {
-                paralyzeDuration = 1000;
-                pointsLost = 1;
-            } else if (game.score <= 20) {
-                paralyzeDuration = 2000;
-                pointsLost = 3;
-            } else if (game.score <= 50) {
-                paralyzeDuration = 3000;
-                pointsLost = 5;
-            } else {
-                paralyzeDuration = 5000;
-                pointsLost = 7;
-            }
-
-            // Apply paralysis
-            game.player.isParalyzed = true;
-            game.player.paralyzedTimeRemaining = paralyzeDuration;
-            game.player.velocityX = 0;
-            game.player.velocityY = 0;
-
-            // Show paralyzed overlay
-            paralyzedOverlay.classList.add('active');
-            paralyzedText.classList.add('active');
-
-            // Reduce score
-            game.score = Math.max(0, game.score - pointsLost);
-            scoreValue.textContent = game.score;
-
-            // Remove paralysis after duration
-            setTimeout(() => {
-                game.player.isParalyzed = false;
-                paralyzedOverlay.classList.remove('active');
-                paralyzedText.classList.remove('active');
-            }, paralyzeDuration);
-        }
-
-        // Keyboard input
-        document.addEventListener('keydown', (e) => {
-            game.keys[e.key] = true;
+        playButton.addEventListener('click', () => {
+            titleScreen.classList.add('hidden');
+            gameScreen.classList.add('active');
+            startGame();
         });
 
-        document.addEventListener('keyup', (e) => {
-            game.keys[e.key] = false;
+        howToButton.addEventListener('click', () => {
+            howToModal.classList.add('active');
         });
 
-        // Update player velocity based on input (only horizontal and vertical)
-        function updatePlayerVelocity() {
-            if (game.player.isParalyzed) {
+        closeModal.addEventListener('click', () => {
+            howToModal.classList.remove('active');
+        });
+
+        howToModal.addEventListener('click', (e) => {
+            if (e.target === howToModal) {
+                howToModal.classList.remove('active');
+            }
+        });
+
+        // Game Logic
+        let gameStarted = false;
+
+        function startGame() {
+            if (gameStarted) return;
+            gameStarted = true;
+
+            // Game constants
+            const GRID_SIZE = 20;
+            const GRID_CELL_SIZE = 40; // 800px / 20 = 40px per cell
+            const PLAYER_SPEED = 5; // grids per second
+            const PRIMOGEM_SPAWN_INTERVAL = 3000; // 3 seconds
+            const BASE_METEOR_SPAWN_INTERVAL = 7000; // 7 seconds (targeting meteors)
+            const BASE_RANDOM_METEOR_SPAWN_INTERVAL = 10000; // 10 seconds (random meteors)
+            const METEOR_WARNING_TIME = 3000; // 3 seconds before meteor lands
+            const METEOR_SIZE = 3; // 3x3 grid
+            const METEOR_HALF_SIZE = Math.floor(METEOR_SIZE / 2); // 1
+            const COLLECTION_RADIUS = 0.3; // How close player needs to be to collect
+
+            // Game state
+            const game = {
+                player: {
+                    gridX: 10,
+                    gridY: 10,
+                    velocityX: 0,
+                    velocityY: 0,
+                    isParalyzed: false,
+                    paralyzedTimeRemaining: 0
+                },
+                score: 0,
+                primogems: [],
+                meteors: [],
+                meteorWarnings: [],
+                keys: {},
+                gameRunning: true,
+                activeMeteorSpawners: {
+                    targeting1: true,
+                    targeting2: false,
+                    random1: true,
+                    random2: false
+                }
+            };
+
+            const gameContainer = document.getElementById('gameContainer');
+            const scoreValue = document.getElementById('scoreValue');
+            const paralyzedOverlay = document.getElementById('paralyzedOverlay');
+            const paralyzedText = document.getElementById('paralyzedText');
+
+            // Create grid cells
+            function createGrid() {
+                for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell';
+                    gameContainer.appendChild(cell);
+                }
+            }
+
+            // Update player visual position
+            function updatePlayerDisplay() {
+                let player = document.getElementById('playerElement');
+                if (!player) {
+                    player = document.createElement('div');
+                    player.id = 'playerElement';
+                    player.className = 'player';
+                    gameContainer.appendChild(player);
+                }
+                // Center player on the grid position
+                player.style.left = (game.player.gridX * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
+                player.style.top = (game.player.gridY * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
+            }
+
+            // Spawn primogem at random location (centered on grid)
+            function spawnPrimogem() {
+                const gridX = Math.floor(Math.random() * GRID_SIZE);
+                const gridY = Math.floor(Math.random() * GRID_SIZE);
+                const primogem = {
+                    id: Date.now() + Math.random(),
+                    gridX: gridX,
+                    gridY: gridY,
+                    element: null
+                };
+                game.primogems.push(primogem);
+                createPrimosgemElement(primogem);
+            }
+
+            function createPrimosgemElement(primogem) {
+                const element = document.createElement('div');
+                element.className = 'primogem';
+                // Center primogem on the grid position
+                element.style.left = (primogem.gridX * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
+                element.style.top = (primogem.gridY * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
+                gameContainer.appendChild(element);
+                primogem.element = element;
+            }
+
+            // Check if player collides with primogem
+            function checkPrimosgemCollision() {
+                for (let i = game.primogems.length - 1; i >= 0; i--) {
+                    const primogem = game.primogems[i];
+                    const distance = Math.sqrt(
+                        Math.pow(game.player.gridX - primogem.gridX, 2) +
+                        Math.pow(game.player.gridY - primogem.gridY, 2)
+                    );
+                    if (distance < COLLECTION_RADIUS) {
+                        game.score++;
+                        scoreValue.textContent = game.score;
+                        primogem.element.remove();
+                        game.primogems.splice(i, 1);
+                        updateMeteorSpawners(); // Check if we need to unlock new meteor spawners
+                    }
+                }
+            }
+
+            // Update which meteor spawners are active based on score
+            function updateMeteorSpawners() {
+                if (game.score >= 30 && !game.activeMeteorSpawners.targeting2) {
+                    game.activeMeteorSpawners.targeting2 = true;
+                }
+                if (game.score >= 50 && !game.activeMeteorSpawners.random2) {
+                    game.activeMeteorSpawners.random2 = true;
+                }
+            }
+
+            // Get dynamic spawn interval based on score
+            function getTargetingMeteorInterval() {
+                if (game.score >= 50) return 5000; // 5 seconds at 50+ points
+                if (game.score >= 30) return 5500; // 5.5 seconds at 30+ points
+                return BASE_METEOR_SPAWN_INTERVAL; // 7 seconds default
+            }
+
+            function getRandomMeteorInterval() {
+                if (game.score >= 50) return 8000; // 8 seconds at 50+ points
+                return BASE_RANDOM_METEOR_SPAWN_INTERVAL; // 10 seconds default
+            }
+
+            // Spawn targeting meteor (locks onto player position)
+            function spawnTargetingMeteor() {
+                // Target the player's current position
+                let gridX = Math.round(game.player.gridX);
+                let gridY = Math.round(game.player.gridY);
+
+                // Clamp to valid grid positions
+                gridX = Math.max(0, Math.min(GRID_SIZE - 1, gridX));
+                gridY = Math.max(0, Math.min(GRID_SIZE - 1, gridY));
+
+                const meteor = {
+                    id: Date.now() + Math.random(),
+                    gridX: gridX,
+                    gridY: gridY,
+                    warningElement: null,
+                    meteorElement: null,
+                    hasLanded: false,
+                    isRandom: false
+                };
+
+                // Create warning indicator (3x3 square centered on player)
+                const warningElement = document.createElement('div');
+                warningElement.className = 'meteor-warning';
+                warningElement.style.left = (gridX * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
+                warningElement.style.top = (gridY * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
+                gameContainer.appendChild(warningElement);
+                meteor.warningElement = warningElement;
+
+                game.meteorWarnings.push(meteor);
+
+                // Schedule meteor to land
+                setTimeout(() => {
+                    landMeteor(meteor);
+                }, METEOR_WARNING_TIME);
+            }
+
+            // Spawn random meteor (no targeting)
+            function spawnRandomMeteor() {
+                // Random position on the grid
+                let gridX = Math.floor(Math.random() * GRID_SIZE);
+                let gridY = Math.floor(Math.random() * GRID_SIZE);
+
+                const meteor = {
+                    id: Date.now() + Math.random(),
+                    gridX: gridX,
+                    gridY: gridY,
+                    warningElement: null,
+                    meteorElement: null,
+                    hasLanded: false,
+                    isRandom: true
+                };
+
+                // Create warning indicator (3x3 square at random location)
+                const warningElement = document.createElement('div');
+                warningElement.className = 'meteor-warning';
+                warningElement.style.left = (gridX * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
+                warningElement.style.top = (gridY * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
+                gameContainer.appendChild(warningElement);
+                meteor.warningElement = warningElement;
+
+                game.meteorWarnings.push(meteor);
+
+                // Schedule meteor to land
+                setTimeout(() => {
+                    landMeteor(meteor);
+                }, METEOR_WARNING_TIME);
+            }
+
+            function landMeteor(meteor) {
+                // Remove warning
+                if (meteor.warningElement) {
+                    meteor.warningElement.remove();
+                }
+
+                // Move to active meteors
+                const index = game.meteorWarnings.indexOf(meteor);
+                if (index > -1) {
+                    game.meteorWarnings.splice(index, 1);
+                }
+                game.meteors.push(meteor);
+                meteor.hasLanded = true;
+
+                // Create meteor visual (3x3 square centered on target)
+                const meteorElement = document.createElement('div');
+                meteorElement.className = 'meteor';
+                meteorElement.style.left = (meteor.gridX * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
+                meteorElement.style.top = (meteor.gridY * GRID_CELL_SIZE + GRID_CELL_SIZE / 2) + 'px';
+                gameContainer.appendChild(meteorElement);
+                meteor.meteorElement = meteorElement;
+
+                // Check collision
+                checkMeteorCollision(meteor);
+
+                // Remove meteor after a short time
+                setTimeout(() => {
+                    if (meteor.meteorElement) {
+                        meteor.meteorElement.remove();
+                    }
+                    const idx = game.meteors.indexOf(meteor);
+                    if (idx > -1) {
+                        game.meteors.splice(idx, 1);
+                    }
+                }, 1000);
+            }
+
+            function checkMeteorCollision(meteor) {
+                // Check if player is in the 3x3 meteor impact area
+                const meteorStartX = meteor.gridX - METEOR_HALF_SIZE;
+                const meteorStartY = meteor.gridY - METEOR_HALF_SIZE;
+                const meteorEndX = meteorStartX + METEOR_SIZE;
+                const meteorEndY = meteorStartY + METEOR_SIZE;
+
+                // Round player position to check grid cell
+                const playerGridX = Math.round(game.player.gridX);
+                const playerGridY = Math.round(game.player.gridY);
+
+                if (
+                    playerGridX >= meteorStartX &&
+                    playerGridX < meteorEndX &&
+                    playerGridY >= meteorStartY &&
+                    playerGridY < meteorEndY
+                ) {
+                    applyMeteorDamage();
+                }
+            }
+
+            function applyMeteorDamage() {
+                let paralyzeDuration;
+                let pointsLost;
+
+                if (game.score <= 10) {
+                    paralyzeDuration = 1000;
+                    pointsLost = 1;
+                } else if (game.score <= 20) {
+                    paralyzeDuration = 2000;
+                    pointsLost = 3;
+                } else if (game.score <= 50) {
+                    paralyzeDuration = 3000;
+                    pointsLost = 5;
+                } else {
+                    paralyzeDuration = 5000;
+                    pointsLost = 7;
+                }
+
+                // Apply paralysis
+                game.player.isParalyzed = true;
+                game.player.paralyzedTimeRemaining = paralyzeDuration;
                 game.player.velocityX = 0;
                 game.player.velocityY = 0;
-                return;
+
+                // Show paralyzed overlay
+                paralyzedOverlay.classList.add('active');
+                paralyzedText.classList.add('active');
+
+                // Reduce score
+                game.score = Math.max(0, game.score - pointsLost);
+                scoreValue.textContent = game.score;
+
+                // Remove paralysis after duration
+                setTimeout(() => {
+                    game.player.isParalyzed = false;
+                    paralyzedOverlay.classList.remove('active');
+                    paralyzedText.classList.remove('active');
+                }, paralyzeDuration);
             }
 
-            let newVelocityX = 0;
-            let newVelocityY = 0;
+            // Keyboard input
+            document.addEventListener('keydown', (e) => {
+                game.keys[e.key] = true;
+            });
 
-            if (game.keys['ArrowUp'] || game.keys['w'] || game.keys['W']) {
-                newVelocityY = -1;
-            }
-            if (game.keys['ArrowDown'] || game.keys['s'] || game.keys['S']) {
-                newVelocityY = 1;
-            }
-            if (game.keys['ArrowLeft'] || game.keys['a'] || game.keys['A']) {
-                newVelocityX = -1;
-            }
-            if (game.keys['ArrowRight'] || game.keys['d'] || game.keys['D']) {
-                newVelocityX = 1;
-            }
+            document.addEventListener('keyup', (e) => {
+                game.keys[e.key] = false;
+            });
 
-            game.player.velocityX = newVelocityX;
-            game.player.velocityY = newVelocityY;
-        }
+            // Update player velocity based on input (only horizontal and vertical)
+            function updatePlayerVelocity() {
+                if (game.player.isParalyzed) {
+                    game.player.velocityX = 0;
+                    game.player.velocityY = 0;
+                    return;
+                }
 
-        // Game update loop
-        let lastFrameTime = Date.now();
-        let primosgemSpawnTime = Date.now();
-        let targetingMeteor1SpawnTime = Date.now();
-        let targetingMeteor2SpawnTime = Date.now();
-        let randomMeteor1SpawnTime = Date.now();
-        let randomMeteor2SpawnTime = Date.now();
+                let newVelocityX = 0;
+                let newVelocityY = 0;
 
-        function update() {
-            const currentTime = Date.now();
-            const deltaTime = (currentTime - lastFrameTime) / 1000; // Convert to seconds
-            lastFrameTime = currentTime;
+                if (game.keys['ArrowUp'] || game.keys['w'] || game.keys['W']) {
+                    newVelocityY = -1;
+                }
+                if (game.keys['ArrowDown'] || game.keys['s'] || game.keys['S']) {
+                    newVelocityY = 1;
+                }
+                if (game.keys['ArrowLeft'] || game.keys['a'] || game.keys['A']) {
+                    newVelocityX = -1;
+                }
+                if (game.keys['ArrowRight'] || game.keys['d'] || game.keys['D']) {
+                    newVelocityX = 1;
+                }
 
-            // Update player velocity based on input
-            updatePlayerVelocity();
-
-            // Move player
-            const moveDistance = PLAYER_SPEED * deltaTime;
-            game.player.gridX += game.player.velocityX * moveDistance;
-            game.player.gridY += game.player.velocityY * moveDistance;
-
-            // Clamp player position to grid
-            game.player.gridX = Math.max(0, Math.min(GRID_SIZE - 1, game.player.gridX));
-            game.player.gridY = Math.max(0, Math.min(GRID_SIZE - 1, game.player.gridY));
-
-            // Update player display
-            updatePlayerDisplay();
-
-            // Check primogem collision
-            checkPrimosgemCollision();
-
-            // Spawn primogems
-            if (currentTime - primosgemSpawnTime >= PRIMOGEM_SPAWN_INTERVAL) {
-                spawnPrimogem();
-                primosgemSpawnTime = currentTime;
+                game.player.velocityX = newVelocityX;
+                game.player.velocityY = newVelocityY;
             }
 
-            // Spawn targeting meteors (lock onto player)
-            const targetingInterval = getTargetingMeteorInterval();
-            if (game.activeMeteorSpawners.targeting1 && currentTime - targetingMeteor1SpawnTime >= targetingInterval) {
-                spawnTargetingMeteor();
-                targetingMeteor1SpawnTime = currentTime;
+            // Game update loop
+            let lastFrameTime = Date.now();
+            let primosgemSpawnTime = Date.now();
+            let targetingMeteor1SpawnTime = Date.now();
+            let targetingMeteor2SpawnTime = Date.now();
+            let randomMeteor1SpawnTime = Date.now();
+            let randomMeteor2SpawnTime = Date.now();
+
+            function update() {
+                const currentTime = Date.now();
+                const deltaTime = (currentTime - lastFrameTime) / 1000; // Convert to seconds
+                lastFrameTime = currentTime;
+
+                // Update player velocity based on input
+                updatePlayerVelocity();
+
+                // Move player
+                const moveDistance = PLAYER_SPEED * deltaTime;
+                game.player.gridX += game.player.velocityX * moveDistance;
+                game.player.gridY += game.player.velocityY * moveDistance;
+
+                // Clamp player position to grid
+                game.player.gridX = Math.max(0, Math.min(GRID_SIZE - 1, game.player.gridX));
+                game.player.gridY = Math.max(0, Math.min(GRID_SIZE - 1, game.player.gridY));
+
+                // Update player display
+                updatePlayerDisplay();
+
+                // Check primogem collision
+                checkPrimosgemCollision();
+
+                // Spawn primogems
+                if (currentTime - primosgemSpawnTime >= PRIMOGEM_SPAWN_INTERVAL) {
+                    spawnPrimogem();
+                    primosgemSpawnTime = currentTime;
+                }
+
+                // Spawn targeting meteors (lock onto player)
+                const targetingInterval = getTargetingMeteorInterval();
+                if (game.activeMeteorSpawners.targeting1 && currentTime - targetingMeteor1SpawnTime >= targetingInterval) {
+                    spawnTargetingMeteor();
+                    targetingMeteor1SpawnTime = currentTime;
+                }
+
+                // Spawn second targeting meteor
+                if (game.activeMeteorSpawners.targeting2 && currentTime - targetingMeteor2SpawnTime >= targetingInterval) {
+                    spawnTargetingMeteor();
+                    targetingMeteor2SpawnTime = currentTime;
+                }
+
+                // Spawn random meteors
+                const randomInterval = getRandomMeteorInterval();
+                if (game.activeMeteorSpawners.random1 && currentTime - randomMeteor1SpawnTime >= randomInterval) {
+                    spawnRandomMeteor();
+                    randomMeteor1SpawnTime = currentTime;
+                }
+
+                // Spawn second random meteor
+                if (game.activeMeteorSpawners.random2 && currentTime - randomMeteor2SpawnTime >= randomInterval) {
+                    spawnRandomMeteor();
+                    randomMeteor2SpawnTime = currentTime;
+                }
+
+                requestAnimationFrame(update);
             }
 
-            // Spawn second targeting meteor
-            if (game.activeMeteorSpawners.targeting2 && currentTime - targetingMeteor2SpawnTime >= targetingInterval) {
-                spawnTargetingMeteor();
-                targetingMeteor2SpawnTime = currentTime;
-            }
-
-            // Spawn random meteors
-            const randomInterval = getRandomMeteorInterval();
-            if (game.activeMeteorSpawners.random1 && currentTime - randomMeteor1SpawnTime >= randomInterval) {
-                spawnRandomMeteor();
-                randomMeteor1SpawnTime = currentTime;
-            }
-
-            // Spawn second random meteor
-            if (game.activeMeteorSpawners.random2 && currentTime - randomMeteor2SpawnTime >= randomInterval) {
-                spawnRandomMeteor();
-                randomMeteor2SpawnTime = currentTime;
-            }
-
-            requestAnimationFrame(update);
-        }
-
-        // Initialize game
-        function init() {
+            // Initialize game
             createGrid();
             updatePlayerDisplay();
             update();
@@ -590,8 +888,6 @@
                 spawnRandomMeteor();
             }, 5000);
         }
-
-        init();
     </script>
 </body>
 </html>
