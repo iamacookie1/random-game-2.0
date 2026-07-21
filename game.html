@@ -884,6 +884,8 @@
         const resumeButton = document.getElementById('resumeButton');
         const homeButton = document.getElementById('homeButton');
 
+        let gameIntervals = [];
+
         playButton.addEventListener('click', () => {
             titleScreen.classList.add('hidden');
             gameScreen.classList.add('active');
@@ -978,10 +980,23 @@
                 pauseModal.classList.remove('active');
                 gameScreen.classList.remove('active');
                 titleScreen.classList.remove('hidden');
+                game.gameRunning = false;
                 
-                // Clear all game elements from the board
-                const elementsToRemove = gameContainer.querySelectorAll('.primogem, .powerup, .meteor, .meteor-warning, .player, .player-aura');
-                elementsToRemove.forEach(element => element.remove());
+                // Clear all intervals
+                gameIntervals.forEach(intervalId => clearInterval(intervalId));
+                gameIntervals = [];
+                
+                // Clear the game container, except the top bar
+                const allChildren = Array.from(gameContainer.children);
+                allChildren.forEach(child => {
+                    if (!child.classList.contains('top-bar')) {
+                        child.remove();
+                    }
+                });
+                
+                // Reset score display
+                scoreValue.textContent = '0';
+                powerupStatus.innerHTML = '';
             });
 
             pauseModal.addEventListener('click', (e) => {
@@ -1357,50 +1372,57 @@
             }
 
             // Spawn intervals
-            let primogem_spawn_interval = setInterval(() => {
-                if (!game.gameRunning) clearInterval(primogem_spawn_interval);
+            let interval1 = setInterval(() => {
+                if (!game.gameRunning) clearInterval(interval1);
                 spawnPrimogem();
             }, game.activePowerups.frenzy.active ? PRIMOGEM_SPAWN_INTERVAL / 5 : PRIMOGEM_SPAWN_INTERVAL);
+            gameIntervals.push(interval1);
 
-            let powerup_spawn_interval = setInterval(() => {
-                if (!game.gameRunning) clearInterval(powerup_spawn_interval);
+            let interval2 = setInterval(() => {
+                if (!game.gameRunning) clearInterval(interval2);
                 spawnPowerup();
             }, POWERUP_SPAWN_INTERVAL);
+            gameIntervals.push(interval2);
 
-            let meteor_spawn_interval_1 = setInterval(() => {
-                if (!game.gameRunning) clearInterval(meteor_spawn_interval_1);
+            let interval3 = setInterval(() => {
+                if (!game.gameRunning) clearInterval(interval3);
                 if (game.activeMeteorSpawners.targeting1) {
                     spawnMeteor(game.player.gridX, game.player.gridY);
                 }
             }, BASE_METEOR_SPAWN_INTERVAL);
+            gameIntervals.push(interval3);
 
-            let meteor_spawn_interval_2 = setInterval(() => {
-                if (!game.gameRunning) clearInterval(meteor_spawn_interval_2);
+            let interval4 = setInterval(() => {
+                if (!game.gameRunning) clearInterval(interval4);
                 if (game.activeMeteorSpawners.targeting2) {
                     spawnMeteor(Math.random() * GRID_SIZE, Math.random() * GRID_SIZE);
                 }
             }, BASE_METEOR_SPAWN_INTERVAL);
+            gameIntervals.push(interval4);
 
-            let meteor_spawn_interval_3 = setInterval(() => {
-                if (!game.gameRunning) clearInterval(meteor_spawn_interval_3);
+            let interval5 = setInterval(() => {
+                if (!game.gameRunning) clearInterval(interval5);
                 if (game.activeMeteorSpawners.random1) {
                     spawnMeteor(Math.random() * GRID_SIZE, Math.random() * GRID_SIZE);
                 }
             }, BASE_RANDOM_METEOR_SPAWN_INTERVAL + Math.random() * 3000);
+            gameIntervals.push(interval5);
 
-            let meteor_spawn_interval_4 = setInterval(() => {
-                if (!game.gameRunning) clearInterval(meteor_spawn_interval_4);
+            let interval6 = setInterval(() => {
+                if (!game.gameRunning) clearInterval(interval6);
                 if (game.activeMeteorSpawners.random2) {
                     spawnMeteor(Math.random() * GRID_SIZE, Math.random() * GRID_SIZE);
                 }
             }, BASE_RANDOM_METEOR_SPAWN_INTERVAL + 1500 + Math.random() * 3000);
+            gameIntervals.push(interval6);
 
             // Update meteor spawning based on score
-            let meteor_difficulty_interval = setInterval(() => {
-                if (!game.gameRunning) clearInterval(meteor_difficulty_interval);
+            let interval7 = setInterval(() => {
+                if (!game.gameRunning) clearInterval(interval7);
                 if (game.score >= 20) game.activeMeteorSpawners.targeting2 = true;
                 if (game.score >= 40) game.activeMeteorSpawners.random2 = true;
             }, 500);
+            gameIntervals.push(interval7);
 
             // Input handling
             document.addEventListener('keydown', (e) => {
